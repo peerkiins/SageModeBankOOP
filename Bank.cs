@@ -3,12 +3,25 @@ namespace SageModeBankOOP
     class Bank
     {
         private int _TotalAccountsRegistered { get; set; }
-        public string Name { get; set; }
-        public Account[] Accounts { get; set; }
-
-        public Bank(string name)
+        private string _name = "Bank";
+        public string Name
         {
-            Name = name;
+            get
+            {
+                return _name;
+            }
+
+            set
+            {
+                _name = value + " Bank";
+            }
+        }
+
+
+        private Account[] Accounts { get; set; }
+
+        public Bank()
+        {
             Accounts = new Account[100];
             _TotalAccountsRegistered = 0;
         }
@@ -38,6 +51,11 @@ namespace SageModeBankOOP
                     return true;
             }
             return false;
+        }
+
+        public void Transfer()
+        {
+
         }
     }
 }
