@@ -9,8 +9,6 @@ namespace SageModeBankOOP
         static Bank b = new Bank();
         static void Main(string[] args)
         {
-
-
             b.Name = "Peerkiins";
             bool ShouldExit = false;
             while (!ShouldExit)
@@ -95,15 +93,7 @@ namespace SageModeBankOOP
                             ShowTransfer();
                             break;
                         case '4':
-                            Console.Clear();
-                            Console.WriteLine("[Transactions]");
-                            Console.WriteLine($"DATE:\t\t\tTRANSACTION:\tFROM:\tAMOUNT:\tBALANCE:");
-                            foreach (Transaction transaction in b.CurrentAccount.GetTransaction())
-                            {
-                                string Target = (transaction.Target.Username != null ? transaction.Target.Username : "");
-                                Console.WriteLine($"{transaction.Date}\t{transaction.Type}\t\t\t{Target}\t{transaction.Amount}\t{transaction.Balance}");
-                            }
-                            Console.ReadKey();
+                            ShowTransactions();
                             break;
                         case '5':
                             ShouldLogout = true;
@@ -178,6 +168,18 @@ namespace SageModeBankOOP
                     b.Transfer(receiverAcc, TranAmount);
                 }
             }
+        }
+        static void ShowTransactions()
+        {
+            Console.Clear();
+            Console.WriteLine("[Transactions]");
+            Console.WriteLine($"DATE:\t\t\tTRANSACTION:\tFROM:\tAMOUNT:\tBALANCE:");
+            foreach (Transaction transaction in b.CurrentAccount.GetTransaction())
+            {
+                string Target = (transaction.Target.Username != null ? transaction.Target.Username : "");
+                Console.WriteLine($"{transaction.Date}\t{transaction.Type}\t\t\t{Target}\t{transaction.Amount}\t{transaction.Balance}");
+            }
+            Console.ReadKey();
         }
     }
 }
