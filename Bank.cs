@@ -6,7 +6,7 @@ namespace SageModeBankOOP
     {
         private int _TotalAccountsRegistered { get; set; }
         private string _name = "Bank";
-        public Account LoggedInAccount { get; set; }
+        public Account CurrentAccount { get; set; }
         public string Name
         {
             get
@@ -20,7 +20,6 @@ namespace SageModeBankOOP
             }
         }
 
-
         private Account[] Accounts { get; set; }
 
         public Bank()
@@ -31,20 +30,15 @@ namespace SageModeBankOOP
 
         public void Register(string username, string password)
         {
-            Accounts[_TotalAccountsRegistered] = new Account
+            Accounts[_TotalAccountsRegistered++] = new Account
             {
                 Id = _TotalAccountsRegistered,
                 Username = username,
                 Password = password,
                 Balance = 0
             };
-            _TotalAccountsRegistered++;
         }
 
-        public bool IsLoggedIn()
-        {
-            return LoggedInAccount != null;
-        }
         public bool Login(string username, string password)
         {
 
@@ -53,16 +47,11 @@ namespace SageModeBankOOP
                 Account account = Accounts[i];
                 if (account.Username == username && account.Password == password)
                 {
-                    LoggedInAccount = account;
+                    CurrentAccount = account;
                     return true;
                 }
             }
             return false;
-        }
-
-        public void ToLogout()
-        {
-            LoggedInAccount = null;
         }
 
         public bool IsAccountExist(string username)
@@ -74,24 +63,24 @@ namespace SageModeBankOOP
             }
             return false;
         }
-        public void Receive(string ReceiverAccUsername, decimal amount)//inbound funds.
+        public void Transfer(string ReceiverAccUsername, decimal TransAmount)
         {
-            if (amount < 0 && amount > LoggedInAccount.Balance)
-            {
-                Console.WriteLine("Invalid amount or Insufficient funds");
-                return;
-            }
             for (int x = 0; x < _TotalAccountsRegistered; x++)
             {
                 Account account = Accounts[x];
                 if (account.Username == ReceiverAccUsername)
                 {
-                    account.Balance += amount;
-                    account.AddTransaction("[Received]", amount);
+                    account.Balance += TransAmount;
+                    CurrentAccount.Balance -= TransAmount;
+                    account.AddTransactions("Received", TransAmount, CurrentAccount);
+                    CurrentAccount.AddTransactions("Sent", TransAmount, account);
                     break;
                 }
             }
             return;
         }
+
+
+
     }
 }
