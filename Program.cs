@@ -10,7 +10,6 @@ namespace SageModeBankOOP
         static string tempbankabbv = string.Empty;
         public Bank[] Banks { get; set; }
         private int _totalbanksregistered { get; set; }
-        // static Bank b = new Bank();
         static Account CurrentAccount;
         static BankNet a = new BankNet();
         static Bank CurrentBank;
@@ -22,68 +21,10 @@ namespace SageModeBankOOP
                 switch (ShowMenu("Register New Bank", "Choose Existing Bank", "Exit"))
                 {
                     case '1':
-                        Console.Clear();
-                        Console.Write("Please enter bank's name: ");
-                        tempbankname = Console.ReadLine().Trim();
-                        if (tempbankname.Length < 0)
-                        {
-                            Console.Clear();
-                            Console.WriteLine("The bank name you entered is invalid.");
-                        }
-                        else if (a.IsBankRegistered(tempbankname))
-                        {
-                            Console.Clear();
-                            Console.WriteLine("The bank you entered is already registered.");
-                        }
-                        else
-                            Console.Clear();
-                        Console.WriteLine("Enter bank Abbreviation: ");
-                        tempbankabbv = Console.ReadLine();
-                        a.RegisterBank(tempbankname, tempbankabbv);
-                        Console.WriteLine("Success!");
-                        Console.ReadKey();
+                        ShowBankRegister();
                         continue;
                     case '2':
-                        Console.Clear();
-                        Console.WriteLine("[Choose Your Bank]");
-                        Console.Write("Please enter your bank's name: ");
-                        tempbankname = Console.ReadLine().Trim();
-                        CurrentBank = a.EnterBank(tempbankname);
-                        bool BankOut = false;
-                        if (CurrentBank != null)
-                        {
-                            while (!BankOut)
-                            {
-                                // b.BankName = "Peerkiins";***
-                                bool ShouldLogout = false;
-                                while (!ShouldLogout)
-                                {
-                                    Console.Clear();
-                                    Console.WriteLine($"Welcome to {CurrentBank.BankName}");
 
-                                    switch (ShowMenu("Register", "Login", "Change Bank", "Exit"))
-                                    {
-                                        case '1':
-                                            ShowRegister();
-                                            continue;
-                                        case '2':
-                                            ShowLogin();
-                                            continue;
-                                        case '3':
-                                            BankOut = true;
-                                            continue;
-                                        case '4':
-                                            break;
-                                    }
-                                }
-                            }
-                        }
-                        else
-                        {
-                            Console.Clear();
-                            Console.WriteLine("The bank you entered is not registered in our system, please try again.");
-                            Console.ReadKey();
-                        }
                         break;
                     case '3':
                         ShouldExit = true;
@@ -103,6 +44,71 @@ namespace SageModeBankOOP
             ConsoleKeyInfo key = Console.ReadKey();
             Console.WriteLine();
             return key.KeyChar;
+        }
+        static void ShowBankRegister()
+        {
+            Console.Clear();
+            Console.Write("Please enter bank's name: ");
+            tempbankname = Console.ReadLine().Trim();
+            if (tempbankname.Length < 0)
+            {
+                Console.Clear();
+                Console.WriteLine("The bank name you entered is invalid.");
+            }
+            else if (a.IsBankRegistered(tempbankname))
+            {
+                Console.Clear();
+                Console.WriteLine("The bank you entered is already registered.");
+            }
+            else
+                Console.Clear();
+            Console.WriteLine("Enter bank Abbreviation: ");
+            tempbankabbv = Console.ReadLine();
+            a.RegisterBank(tempbankname, tempbankabbv);
+            Console.WriteLine("Success!");
+            Console.ReadKey();
+        }
+        static void ShowEnterBank()
+        {
+            Console.Clear();
+            Console.WriteLine("[Choose Your Bank]");
+            Console.Write("Please enter your bank's name: ");
+            tempbankname = Console.ReadLine().Trim();
+            CurrentBank = a.EnterBank(tempbankname);
+            bool BankOut = false;
+            if (CurrentBank != null)
+            {
+                while (!BankOut)
+                {
+                    bool ShouldLogout = false;
+                    while (!ShouldLogout)
+                    {
+                        Console.Clear();
+                        Console.WriteLine($"Welcome to {CurrentBank.BankName}");
+
+                        switch (ShowMenu("Register", "Login", "Change Bank", "Exit"))
+                        {
+                            case '1':
+                                ShowRegister();
+                                continue;
+                            case '2':
+                                ShowLogin();
+                                continue;
+                            case '3':
+                                BankOut = true;
+                                continue;
+                            case '4':
+                                break;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                Console.Clear();
+                Console.WriteLine("The bank you entered is not registered in our system, please try again.");
+                Console.ReadKey();
+            }
         }
         static void ShowRegister()
         {
