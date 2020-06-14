@@ -4,10 +4,12 @@ namespace SageModeBankOOP
 {
     class Bank
     {
-        private int _TotalAccountsRegistered { get; set; }
+        private int _totalaccountstegistered { get; set; }
+        private int _newaccounttreshold { get; set; }
+        public int BankCode { get; set; }
         private string _name = "Bank";
-        public Account CurrentAccount { get; set; }
-        public string Name
+
+        public string BankName
         {
             get
             {
@@ -19,39 +21,53 @@ namespace SageModeBankOOP
                 _name = value + " Bank";
             }
         }
+        public string BankAbbv { get; set; }
 
         private Account[] Accounts { get; set; }
 
         public Bank()
         {
             Accounts = new Account[100];
-            _TotalAccountsRegistered = 0;
+            _totalaccountstegistered = 0;
         }
 
         public void Register(string username, string password)
         {
-            Accounts[_TotalAccountsRegistered++] = new Account
+            _newaccounttreshold = Accounts.Length - 15;
+            if (_totalaccountstegistered == _newaccounttreshold)
             {
-                Id = _TotalAccountsRegistered,
-                Username = username,
-                Password = password,
-                Balance = 0
-            };
+                AccountLengthResize();
+                Accounts[_totalaccountstegistered++] = new Account
+                {
+                    UserId = _totalaccountstegistered,
+                    Username = username,
+                    Password = password,
+                    Balance = 0
+                };
+            }
+            else
+            {
+                Accounts[_totalaccountstegistered++] = new Account
+                {
+                    UserId = _totalaccountstegistered,
+                    Username = username,
+                    Password = password,
+                    Balance = 0
+                };
+            }
         }
 
-        public bool Login(string username, string password)
+        public Account Login(string username, string password)
         {
 
-            for (int i = 0; i < _TotalAccountsRegistered; i++)
+            foreach (Account account in Accounts)
             {
-                Account account = Accounts[i];
-                if (account.Username == username && account.Password == password)
+                if (account != null && account.Username == username && account.Password == password)
                 {
-                    CurrentAccount = account;
-                    return true;
+                    return account;
                 }
             }
-            return false;
+            return null;
         }
 
         public bool IsAccountExist(string username)
@@ -63,24 +79,39 @@ namespace SageModeBankOOP
             }
             return false;
         }
-        public void Transfer(string ReceiverAccUsername, decimal TransAmount)
+        public void Transfer(Account Sender, int ReceiverAccUserId, decimal TransAmount)
         {
-            for (int x = 0; x < _TotalAccountsRegistered; x++)
+            Account Receiver = Accounts[ReceiverAccUserId];
+            if (Receiver != null)
             {
-                Account account = Accounts[x];
-                if (account.Username == ReceiverAccUsername)
+                if (Sender.Balance < TransAmount)
                 {
-                    account.Balance += TransAmount;
-                    CurrentAccount.Balance -= TransAmount;
-                    account.AddTransactions("Received", TransAmount, CurrentAccount);
-                    CurrentAccount.AddTransactions("Sent", TransAmount, account);
-                    break;
+                    Console.Clear();
+                    Console.WriteLine("Insufficient Balance");
+                }
+                else if (TransAmount < 0)
+                {
+                    Console.Clear();
+                    Console.WriteLine("Invalid Amount");
+                }
+                else
+                {
+                    Receiver.Balance += TransAmount;
+                    Sender.Balance -= TransAmount;
+                    Receiver.AddTransactions("Received", TransAmount, Sender, Receiver);
+                    Sender.AddTransactions("Sent", TransAmount, Receiver, Sender);
                 }
             }
             return;
         }
-
-
-
+        public void AccountLengthResize()
+        {
+            Account[] TempAccnts = new Account[Accounts.Length + 100];
+            for (int y = 0; y < _totalaccountstegistered; y++)
+            {
+                TempAccnts[y] = Accounts[y];
+                Accounts = TempAccnts;
+            }
+        }
     }
 }

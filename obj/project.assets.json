@@ -8,19 +8,19 @@
     ".NETCoreApp,Version=v3.1": []
   },
   "packageFolders": {
-    "/home/rawriclark/.nuget/packages/": {}
+    "/home/perkinspetter/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/rawriclark/Projects/SageModeBankOOP/SageModeBankOOP.csproj",
+      "projectUniqueName": "/home/perkinspetter/SageModeBankOOP/SageModeBankOOP.csproj",
       "projectName": "SageModeBankOOP",
-      "projectPath": "/home/rawriclark/Projects/SageModeBankOOP/SageModeBankOOP.csproj",
-      "packagesPath": "/home/rawriclark/.nuget/packages/",
-      "outputPath": "/home/rawriclark/Projects/SageModeBankOOP/obj/",
+      "projectPath": "/home/perkinspetter/SageModeBankOOP/SageModeBankOOP.csproj",
+      "packagesPath": "/home/perkinspetter/.nuget/packages/",
+      "outputPath": "/home/perkinspetter/SageModeBankOOP/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "/home/rawriclark/.nuget/NuGet/NuGet.Config"
+        "/home/perkinspetter/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "netcoreapp3.1"
