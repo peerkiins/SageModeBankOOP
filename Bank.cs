@@ -1,116 +1,99 @@
-using System;
+using System.Collections.Generic;
 
 namespace SageModeBankOOP
 {
     class Bank
     {
-        private int _totalaccountstegistered { get; set; }
-        private int _newaccounttreshold { get; set; }
-        public int BankCode { get; set; }
-        private string _name = "Bank";
-
-        public string BankName
-        {
-            get
-            {
-                return _name;
-            }
-
-            set
-            {
-                _name = value + " Bank";
-            }
-        }
-        public string BankAbbv { get; set; }
-
-        private Account[] Accounts { get; set; }
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Abbv { get; set; }
+        private int _totalaccountsregistered { get; set; }
+        public Account[] Accounts { get; set; }
 
         public Bank()
         {
-            Accounts = new Account[100];
-            _totalaccountstegistered = 0;
+            Accounts = new Account[50];
+            _totalaccountsregistered = 0;
         }
-
-        public void Register(string username, string password)
+        public bool IsAccountExist(string TempUsername)
         {
-            _newaccounttreshold = Accounts.Length - 15;
-            if (_totalaccountstegistered == _newaccounttreshold)
+            foreach (Account account in Accounts)
             {
-                AccountLengthResize();
-                Accounts[_totalaccountstegistered++] = new Account
+                if (account != null && TempUsername == account.Username)
+                    return true;
+            }
+            return false;
+        }
+        public void RegisterAccount(string TempUsername, string Temppassword)
+        {
+            if (_totalaccountsregistered == Accounts.Length - 5)
+            {
+                AccArrLengthResize();
+                Accounts[_totalaccountsregistered++] = new Account
                 {
-                    UserId = _totalaccountstegistered,
-                    Username = username,
-                    Password = password,
-                    Balance = 0
+                    Username = TempUsername,
+                    Password = Temppassword,
+                    Id = _totalaccountsregistered
                 };
             }
             else
             {
-                Accounts[_totalaccountstegistered++] = new Account
+                Accounts[_totalaccountsregistered++] = new Account
                 {
-                    UserId = _totalaccountstegistered,
-                    Username = username,
-                    Password = password,
-                    Balance = 0
+                    Username = TempUsername,
+                    Password = Temppassword,
+                    Id = _totalaccountsregistered
                 };
             }
         }
-
-        public Account Login(string username, string password)
+        public void AccArrLengthResize()
         {
-
+            Account[] TempAccounts = new Account[Accounts.Length + 50];
+            for (int x = 0; x < _totalaccountsregistered; x++)
+            {
+                TempAccounts[x] = Accounts[x];
+                Accounts = TempAccounts;
+            }
+        }
+        public Account LoginAccount(string TempUsername, string Temppassword)
+        {
             foreach (Account account in Accounts)
             {
-                if (account != null && account.Username == username && account.Password == password)
+                if (account != null && account.Username == TempUsername && account.Password == Temppassword)
                 {
                     return account;
                 }
             }
             return null;
         }
-
-        public bool IsAccountExist(string username)
+        public Account ReceiverAccount(int AccountId)
         {
             foreach (Account account in Accounts)
             {
-                if (account != null && account.Username == username)
-                    return true;
-            }
-            return false;
-        }
-        public void Transfer(Account Sender, int ReceiverAccUserId, decimal TransAmount)
-        {
-            Account Receiver = Accounts[ReceiverAccUserId];
-            if (Receiver != null)
-            {
-                if (Sender.Balance < TransAmount)
+                if (account != null && account.Id == AccountId)
                 {
-                    Console.Clear();
-                    Console.WriteLine("Insufficient Balance");
-                }
-                else if (TransAmount < 0)
-                {
-                    Console.Clear();
-                    Console.WriteLine("Invalid Amount");
-                }
-                else
-                {
-                    Receiver.Balance += TransAmount;
-                    Sender.Balance -= TransAmount;
-                    Receiver.AddTransactions("Received", TransAmount, Sender, Receiver);
-                    Sender.AddTransactions("Sent", TransAmount, Receiver, Sender);
+                    return account;
                 }
             }
-            return;
+            return null;
         }
-        public void AccountLengthResize()
+        public string Transfer(decimal Amount, Account Sender, Account Receiver)
         {
-            Account[] TempAccnts = new Account[Accounts.Length + 100];
-            for (int y = 0; y < _totalaccountstegistered; y++)
+            if (Amount <= 0)
             {
-                TempAccnts[y] = Accounts[y];
-                Accounts = TempAccnts;
+                return "Invalid Amount!";
+            }
+            else if (Amount > Sender.Balance)
+            {
+                return "Insufficient Funds";
+            }
+            else
+            {
+                Sender.Balance -= Amount;
+                Sender.Addtransaction("TXR", Amount, Sender, Receiver);
+                Receiver.Balance += Amount;
+                Receiver.Addtransaction("TXR", Amount, Sender, Receiver);
+                return "Success!";
             }
         }
     }

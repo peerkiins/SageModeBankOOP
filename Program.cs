@@ -4,31 +4,163 @@ namespace SageModeBankOOP
 {
     class Program
     {
-        static string tempUsername = string.Empty;
-        static string tempPassword = string.Empty;
-        static string tempbankname = string.Empty;
-        static string tempbankabbv = string.Empty;
-        public Bank[] Banks { get; set; }
-        private int _totalbanksregistered { get; set; }
+        static string TempBankName = String.Empty;
+        static string TempBankAbbv = String.Empty;
+        static string TempUsername = String.Empty;
+        static string TempPassword = string.Empty;
         static Account CurrentAccount;
-        static BankNet a = new BankNet();
         static Bank CurrentBank;
-        static void Main(string[] args)
+        public Bank[] Banks = new Bank[10];
+        private int _bankcounter { get; set; }
+
+        static void Main()
         {
-            bool ShouldExit = false;
-            while (!ShouldExit)
+            Program p = new Program();
+            bool shouldExit = false;
+            while (!shouldExit)
             {
-                switch (ShowMenu("Register New Bank", "Choose Existing Bank", "Exit"))
+                switch (ShowMenu("Choose Bank", "Register a new bank", "Exit"))
                 {
                     case '1':
-                        ShowBankRegister();
+                        Console.Clear();
+                        Console.WriteLine("[List of Registered Banks]");
+                        p.ShowBankList();
+                        Console.Write("\n[Select Bank]");
+                        Console.Write("\nPlease Enter your bank's Id: ");
+                        int TempBankId;
+                        int.TryParse(Console.ReadLine(), out TempBankId);
+                        CurrentBank = p.EnterChosenBanks(TempBankId);
+                        if (CurrentBank != null)
+                        {
+                            bool ExitBank = false;
+                            while (!ExitBank)
+                            {
+                                switch (ShowMenu("Register New Account", "Login Account", "Change Bank", "Exit"))
+                                {
+                                    case '1':
+                                        Console.Clear();
+                                        Console.Write("\n[Account Registration]");
+                                        Console.Write("Enter Username: ");
+                                        TempUsername = Console.ReadLine().Trim();
+                                        if (TempUsername.Length < 4)
+                                        {
+                                            Console.WriteLine("Username contains an invalid character");
+                                        }
+                                        else if (CurrentBank.IsAccountExist(TempUsername))
+                                        {
+                                            Console.WriteLine("Account already existed");
+                                        }
+                                        else
+                                        {
+                                            Console.Write("\nEnter your password: ");
+                                            TempPassword = Console.ReadLine();
+                                            CurrentBank.RegisterAccount(TempUsername, TempPassword);
+                                            Console.WriteLine("Success!");
+                                        }
+                                        continue;
+                                    case '2':
+                                        Console.Clear();
+                                        Console.Write("\n[Login]");
+                                        Console.Write("Enter Username: ");
+                                        TempUsername = Console.ReadLine().Trim();
+                                        Console.Write("\nEnter your password: ");
+                                        TempPassword = Console.ReadLine();
+                                        CurrentAccount = CurrentBank.LoginAccount(TempUsername, TempPassword);
+                                        if (CurrentAccount != null)
+                                        {
+                                            bool IsLoggedOut = false;
+                                            while (!IsLoggedOut)
+                                            {
+                                                switch (ShowMenu("Deposit", "Withdraw", "Transfer", "Transactions", "Logout", "Exit"))
+                                                {
+                                                    case '1':
+                                                        Console.Clear();
+                                                        Console.WriteLine("[Deposit]");
+                                                        Console.Write("\nEnter amount to deposit: ");
+                                                        decimal DEPAmount;
+                                                        decimal.TryParse(Console.ReadLine(), out DEPAmount);
+                                                        Console.WriteLine(CurrentAccount.Deposit(DEPAmount));
+                                                        continue;
+                                                    case '2':
+                                                        Console.Clear();
+                                                        Console.WriteLine("[Withdraw]");
+                                                        Console.Write("\nEnter amount to withdraw: ");
+                                                        decimal WDLAmount;
+                                                        decimal.TryParse(Console.ReadLine(), out WDLAmount);
+                                                        Console.WriteLine(CurrentAccount.Withdraw(WDLAmount));
+                                                        continue;
+                                                    case '3':
+                                                        Console.Clear();
+                                                        Console.WriteLine("Fund Transfer]");
+                                                        Console.Write("Enter recipient's account ID: ");
+                                                        int ReceiverId;
+                                                        int.TryParse(Console.ReadLine(), out ReceiverId);
+                                                        Account Receiver = CurrentBank.ReceiverAccount(ReceiverId);
+                                                        Console.Write("\nEnter amount to transfer: ");
+                                                        decimal TXRAmount;
+                                                        decimal.TryParse(Console.ReadLine(), out TXRAmount);
+                                                        Console.WriteLine(CurrentBank.Transfer(TXRAmount, CurrentAccount, Receiver));
+                                                        continue;
+                                                    case '4':
+                                                        Console.Clear();
+                                                        Console.WriteLine("[Transactions]");
+                                                        Console.WriteLine("DATE\t\t\tTYPE\t\tSENDER\t\tRECEIVER\t\tAMOUNT\t\tBALANCE");
+                                                        foreach (Transaction transaction in CurrentAccount.GetTransactions())
+                                                        {
+                                                            string Sender = transaction.Sender.Username;
+                                                            string TReceiver = transaction.Receiver.Username;
+                                                            Console.WriteLine($"{transaction.Date}\t\t{transaction.Type}\t\t{Sender}\t\t{TReceiver}\t\t{transaction.Amount}\t\t{transaction.Balance}");
+                                                        }
+                                                        continue;
+                                                    case '5':
+                                                        IsLoggedOut = true;
+                                                        continue;
+                                                    case '6':
+                                                        break;
+                                                }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            Console.WriteLine("Login Failed, Username and Password does not match. Try again.");
+                                        }
+                                        continue;
+                                    case '3':
+                                        ExitBank = true;
+                                        continue;
+                                    case '4':
+                                        break;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("Entering bank failed, please try again..");
+                        }
                         continue;
                     case '2':
-
-                        break;
+                        Console.Clear();
+                        Console.WriteLine("\n[Register Bank]");
+                        Console.Write("\nPlease Enter your bank's name: ");
+                        TempBankName = Console.ReadLine().Trim();
+                        Console.Write("Enter desired Abbreviation: ");
+                        TempBankAbbv = Console.ReadLine().Trim();
+                        if (TempBankName.Length >= 5 && TempBankAbbv.Length <= 1)
+                        {
+                            Console.WriteLine("Bankname must be more than 5 characters and Bankcode must be atleast 2 characters.");
+                        }
+                        else if (p.isBankExist(TempBankName, TempBankAbbv))
+                        {
+                            Console.WriteLine("Bankname or Bankcode is already registered in our system.");
+                        }
+                        else
+                        {
+                            p.RegisterBank(TempBankName, TempBankAbbv);
+                        }
+                        continue;
                     case '3':
-                        ShouldExit = true;
-                        return;
+                        shouldExit = true;
+                        break;
                 }
             }
         }
@@ -37,7 +169,7 @@ namespace SageModeBankOOP
             string menuString = "Press ";
             for (int i = 0; i < items.Length; i++)
             {
-                string postFix = i == items.Length - 1 ? string.Empty : ", ";
+                string postFix = i == items.Length - 1 ? string.Empty : ",";
                 menuString += $"{i + 1} to {items[i]}{postFix}";
             }
             Console.WriteLine($"\n{menuString}, ");
@@ -45,210 +177,72 @@ namespace SageModeBankOOP
             Console.WriteLine();
             return key.KeyChar;
         }
-        static void ShowBankRegister()
+        public void ShowBankList()
         {
-            Console.Clear();
-            Console.Write("Please enter bank's name: ");
-            tempbankname = Console.ReadLine().Trim();
-            if (tempbankname.Length < 0)
+            Console.WriteLine("Bank Id\t\tBank name\t\tAbbv.");
+            foreach (Bank bank in Banks)
             {
-                Console.Clear();
-                Console.WriteLine("The bank name you entered is invalid.");
-            }
-            else if (a.IsBankRegistered(tempbankname))
-            {
-                Console.Clear();
-                Console.WriteLine("The bank you entered is already registered.");
-            }
-            else
-                Console.Clear();
-            Console.WriteLine("Enter bank Abbreviation: ");
-            tempbankabbv = Console.ReadLine();
-            a.RegisterBank(tempbankname, tempbankabbv);
-            Console.WriteLine("Success!");
-            Console.ReadKey();
-        }
-        static void ShowEnterBank()
-        {
-            Console.Clear();
-            Console.WriteLine("[Choose Your Bank]");
-            Console.Write("Please enter your bank's name: ");
-            tempbankname = Console.ReadLine().Trim();
-            CurrentBank = a.EnterBank(tempbankname);
-            bool BankOut = false;
-            if (CurrentBank != null)
-            {
-                while (!BankOut)
+                for (int x = 0; x < _bankcounter; x++)
                 {
-                    bool ShouldLogout = false;
-                    while (!ShouldLogout)
-                    {
-                        Console.Clear();
-                        Console.WriteLine($"Welcome to {CurrentBank.BankName}");
-
-                        switch (ShowMenu("Register", "Login", "Change Bank", "Exit"))
-                        {
-                            case '1':
-                                ShowRegister();
-                                continue;
-                            case '2':
-                                ShowLogin();
-                                continue;
-                            case '3':
-                                BankOut = true;
-                                continue;
-                            case '4':
-                                break;
-                        }
-                    }
+                    Console.WriteLine($"{bank.Id}\t\t{bank.Name}\t\t{bank.Abbv}");
                 }
             }
-            else
-            {
-                Console.Clear();
-                Console.WriteLine("The bank you entered is not registered in our system, please try again.");
-                Console.ReadKey();
-            }
         }
-        static void ShowRegister()
+        public Bank EnterChosenBanks(int TempBankId)
         {
-            Console.Clear();
-            Console.WriteLine("[Registration]");
-            Console.Write("Please enter your username: ");
-            tempUsername = Console.ReadLine().Trim();
-            if (tempUsername.Length < 4 && tempUsername.Length! > 8)
+            foreach (Bank bank in Banks)
             {
-                Console.WriteLine("Username must be atleast 4 characters and not more than 8 Characters.");
-                Console.ReadKey();
-            }
-            else if (CurrentBank.IsAccountExist(tempUsername))
-            {
-                Console.WriteLine("Account already existed.");
-                Console.ReadKey();
-            }
-            else
-            {
-                Console.Write("Please enter your password: ");
-                tempPassword = Console.ReadLine();
-                CurrentBank.Register(tempUsername, tempPassword);
-                Console.WriteLine("You have registered sucessfully!");
-                Console.ReadKey();
-            }
-        }
-        static void ShowLogin()
-        {
-            Console.Clear();
-            Console.WriteLine("[Login]");
-            Console.Write("Please enter your Username: ");
-            tempUsername = Console.ReadLine();
-            Console.Write("Please enter your Password: ");
-            tempPassword = Console.ReadLine();
-            CurrentAccount = CurrentBank.Login(tempUsername, tempPassword);
-            bool ShouldLogout = false;
-            if (CurrentAccount != null)
-            {
-                Console.WriteLine("Login Successful.");
-                while (!ShouldLogout)
+                if (bank != null && TempBankId == bank.Id)
                 {
-                    Console.Clear();
-                    Console.WriteLine($"Hi, {CurrentAccount.Username}");
-                    Console.WriteLine($"your current balance is {CurrentAccount.Balance}");
-                    switch (ShowMenu("Deposit", "Withdraw", "Transfer", "Transactions", "Logout"))
-                    {
-                        case '1':
-                            ShowDeposit();
-                            break;
-                        case '2':
-                            ShowWithdraw();
-                            break;
-                        case '3':
-                            ShowTransfer();
-                            break;
-                        case '4':
-                            ShowTransactions();
-                            break;
-                        case '5':
-                            ShouldLogout = true;
-                            break;
-                        default:
-                            break;
-                    }
+                    return bank;
                 }
             }
-            else
-            {
-                Console.Clear();
-                Console.WriteLine("Username and Password does not match.");
-                Console.ReadKey();
-            }
+            return null;
         }
-        static void ShowDeposit()
+        public bool isBankExist(string TempBankName, string TempBankCode)
         {
-            Console.Clear();
-            Console.WriteLine("[Deposit]");
-            Console.Write("Enter deposit amount: ");
-            decimal DepAmount;
-            Decimal.TryParse(Console.ReadLine(), out DepAmount);
-            if (DepAmount <= 0)
+            foreach (Bank bank in Banks)
             {
-                Console.WriteLine("Invalid Amount");
-            }
-            else
-            {
-                CurrentAccount.Deposit(DepAmount);
-            }
-        }
-        static void ShowWithdraw()
-        {
-            Console.Clear();
-            Console.WriteLine("[Withdraw]");
-            Console.Write("Enter amount: ");
-            decimal WithAmount;
-            if (Decimal.TryParse(Console.ReadLine(), out WithAmount))
-            {
-                if (CurrentAccount.Balance < WithAmount || WithAmount < 0)
+                if (bank != null && TempBankName == bank.Name || TempBankCode == bank.Abbv)
                 {
-                    Console.WriteLine("Insufficient Funds or Invalid Amount");
+                    return true;
+                }
+            }
+            return false;
+        }
+        public void RegisterBank(string TempBankName, string TempBankCode)
+        {
+            foreach (Bank bank in Banks)
+            {
+                if (_bankcounter == Banks.Length - 3)
+                {
+                    BankArrLengthResize();
+                    Banks[_bankcounter++] = new Bank
+                    {
+                        Id = _bankcounter,
+                        Name = TempBankName,
+                        Abbv = TempBankCode,
+                    };
                 }
                 else
                 {
-                    CurrentAccount.Withdraw(WithAmount);
+                    Banks[_bankcounter++] = new Bank
+                    {
+                        Id = _bankcounter,
+                        Name = TempBankName,
+                        Abbv = TempBankCode,
+                    };
                 }
             }
         }
-        static void ShowTransfer()
+        public void BankArrLengthResize()
         {
-            Console.Clear();
-            Console.WriteLine("[Transfer]");
-            Console.Write("Enter recipient Account ID: ");
-            int receiverAccId;
-            if (int.TryParse(Console.ReadLine(), out receiverAccId))
+            Bank[] TempBanks = new Bank[Banks.Length + 10];
+            for (int x = 0; x < _bankcounter; x++)
             {
-                Console.Write("Enter amount: ");
-                decimal TranAmount;
-                if (decimal.TryParse(Console.ReadLine(), out TranAmount))
-                {
-                    CurrentBank.Transfer(CurrentAccount, receiverAccId, TranAmount);
-                }
+                TempBanks[x] = Banks[x];
+                Banks = TempBanks;
             }
-        }
-        static void ShowTransactions()
-        {
-            Console.Clear();
-            Console.WriteLine("[Transactions]");
-            Console.WriteLine($"DATE:\t\t\tTRANSACTION:\tFROM:\tTO:\tAMOUNT:\tBALANCE:");
-            foreach (Transaction transaction in CurrentAccount.GetTransaction())
-            {
-                string Sender = (transaction.Sender.Username == null ? transaction.Sender.Username : "");//check
-                string Receiver = (transaction.Receiver.Username == null ? transaction.Receiver.Username : "");
-                Console.WriteLine($"{transaction.Date}\t{transaction.Type}\t\t\t{Sender}\t{Receiver}\t{transaction.Amount}\t{transaction.Balance}");
-            }
-            Console.ReadKey();
-        }
-        public Program()
-        {
-            Banks = new Bank[10];
-            _totalbanksregistered = 0;
         }
     }
 }

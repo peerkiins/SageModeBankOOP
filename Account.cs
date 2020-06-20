@@ -1,78 +1,94 @@
+using System;
+
 namespace SageModeBankOOP
 {
     class Account
     {
-        public int UserId { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
+        public int Id { get; set; }
         public decimal Balance { get; set; }
-        private int _transcount { get; set; }
-        private int _transfercounttreshold { get; set; }
         private Transaction[] Transactions { get; set; }
+        private int _TotalTransactionCount { get; set; }
         public Account()
         {
-            Transactions = new Transaction[250];
-            _transcount = 0;
+            Transactions = new Transaction[100];
+            _TotalTransactionCount = 0;
         }
-        public void AddTransactions(string transaction, decimal amount, Account sender, Account receiver)
+        public string Deposit(decimal Amount)
         {
-            _transfercounttreshold = Transactions.Length - 25;
-            if (_transcount == _transfercounttreshold)
+            if (Amount <= 0)
             {
-                TransactionLengthResize();
-                Transactions[_transcount++] = new Transaction
+                return "Invalid Amount";
+            }
+            else
+            {
+                Balance += Amount;
+                Addtransaction("DEP", Amount, null, this);
+                return "Success!";
+            }
+        }
+        public string Withdraw(decimal Amount)
+        {
+            if (Amount <= 0)
+            {
+                return "Invalid Amount";
+            }
+            else if (Amount > this.Balance)
+            {
+                return "Insufficient Funds!";
+            }
+            else
+            {
+                Balance -= Amount;
+                Addtransaction("WDL", Amount, this, null);
+                return "Success!";
+            }
+        }
+        public void Addtransaction(string TType, decimal Amount, Account Sender, Account Receiver)
+        {
+            if (_TotalTransactionCount == Transactions.Length - 10)
+            {
+                TransArrResize();
+                Transactions[_TotalTransactionCount] = new Transaction
                 {
-                    Date = System.DateTime.Now,
-                    Type = transaction,
-                    Amount = amount,
-                    Balance = Balance,
-                    Sender = sender,
-                    Receiver = receiver
+                    Date = DateTime.Now,
+                    Type = TType,
+                    Amount = Amount,
+                    Sender = Sender,
+                    Receiver = Receiver
                 };
             }
             else
             {
-                Transactions[_transcount++] = new Transaction
+                Transactions[_TotalTransactionCount] = new Transaction
                 {
-                    Date = System.DateTime.Now,
-                    Type = transaction,
-                    Amount = amount,
-                    Balance = Balance,
-                    Sender = sender,
-                    Receiver = receiver
+                    Date = DateTime.Now,
+                    Type = TType,
+                    Amount = Amount,
+                    Sender = Sender,
+                    Receiver = Receiver
                 };
             }
         }
-
-        public void Withdraw(decimal WithAmount)
+        public void TransArrResize()
         {
-            Balance -= WithAmount;
-            AddTransactions("Withdraw", WithAmount, this, null);
-        }
-
-        public void Deposit(decimal DepAmount)
-        {
-            Balance += DepAmount;
-            AddTransactions("Deposit", DepAmount, null, this);
-        }
-
-        public void TransactionLengthResize()
-        {
-            Transaction[] TempTrans = new Transaction[Transactions.Length + 100];
-            for (int y = 0; y < _transcount; y++)
+            Transaction[] TempTransactions = new Transaction[Transactions.Length + 50];
+            for (int x = 0; x < _TotalTransactionCount; x++)
             {
-                TempTrans[y] = Transactions[y];
-                Transactions = TempTrans;
+                TempTransactions[x] = Transactions[x];
+                Transactions = TempTransactions;
             }
         }
-        public Transaction[] GetTransaction()
+        public Transaction[] GetTransactions()
         {
-            Transaction[] Result = new Transaction[_transcount];
-            for (int x = 0; x < _transcount; x++)
+            Transaction[] Copy = new Transaction[_TotalTransactionCount];
+            for (int x = 0; x < _TotalTransactionCount; x++)
             {
-                Result[x] = Transactions[x];
+                Copy[x] = Transactions[x];
+
             }
-            return Result;
+            return Copy;
         }
     }
 }
